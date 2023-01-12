@@ -11,7 +11,7 @@ trim_trailing_whitespace = true
 [{*.md,*.diff}]
 trim_trailing_whitespace = false
 
-[{*.php,*.py,*.md}]
+[{*.php,*.py}]
 indent_size = 4
 
 [*.json]
