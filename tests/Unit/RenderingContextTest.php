@@ -23,6 +23,7 @@ class RenderingContextTest extends TestCase
 
         $this->assertEquals(1, count($context['errors']));
         $this->assertEquals('I am e1 title', $error['title']);
+        $this->assertEquals('I am e1 detail', $error['message']);
         $this->assertEquals('I am e1 detail', $error['detail']);
     }
 }

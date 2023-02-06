@@ -14,6 +14,7 @@ class ApplicationExceptionContext
 {
     public const FIELD_TITLE = 'title';
     public const FIELD_DETAIL = 'detail';
+    public const FIELD_MESSAGE = 'message';
     public const FIELD_STATUS = 'status';
     public const FIELD_EXCEPTION_CLASS = 'exception_class';
     public const FIELD_STACKTRACE = 'stacktrace';
@@ -87,10 +88,12 @@ class ApplicationExceptionContext
     public function getContext(?array $fields = null, bool $hideInternalDetail = false): array
     {
         $e = $this->exception;
+        $detail = $this->getDetail($hideInternalDetail);
 
         $array = [
             self::FIELD_TITLE => $this->getTitle(),
-            self::FIELD_DETAIL => $this->getDetail($hideInternalDetail),
+            self::FIELD_DETAIL => $detail,
+            self::FIELD_MESSAGE => $detail,
             self::FIELD_STATUS => $this->getStatus(),
             self::FIELD_EXCEPTION_CLASS => $e::class,
             self::FIELD_STACKTRACE => $this->getFullStacktrace(),

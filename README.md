@@ -20,6 +20,61 @@ If you are trying to create a new PHP Composer package, whether it is going to b
     - Console
     - Job
 
+### API Error Response Example
+
+```json
+{
+  "errors": [
+    {
+      "title": "Resource Not Found",
+      "detail": "User Not Found",
+      "message": "User Not Found",
+      "status": 400
+    }
+  ]
+}
+```
+
+### Error Log Example
+
+```json
+Here is the example of error log context:
+
+```json
+{
+  "detail": "A fake message",
+  "adapter": {
+    "type": "API",
+    "route": "test-route",
+    "method": "GET",
+    "url": "http://localhost/test-route",
+    "input": []
+  },
+  "errors": [
+    {
+      "title": "Unable To Do Something",
+      "detail": "A fake message",
+      "exception_class": "OnrampLab\\CleanArchitecture\\Exceptions\\UseCaseException",
+      "stacktrace": [
+        "## /var/www/html/tests/Unit/Exceptions/HandlerTest.php(149)",
+        "#0 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestCase.php(1548): OnrampLab\\CleanArchitecture\\Tests\\Unit\\Exceptions\\HandlerTest->handleUseCaseException2()"
+      ]
+    },
+    {
+      "title": "Fake Domain Exception",
+      "detail": "A fake message",
+      "exception_class": "OnrampLab\\CleanArchitecture\\Tests\\Unit\\Exceptions\\FakeDomainException",
+      "stacktrace": [
+        "## /var/www/html/tests/Unit/Exceptions/HandlerTest.php(146)",
+        "#0 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestCase.php(1548): OnrampLab\\CleanArchitecture\\Tests\\Unit\\Exceptions\\HandlerTest->handleUseCaseException2()"
+      ]
+    }
+  ]
+}
+
+```
+```
+
 ## Tech Features
 
 - PSR-4 autoloading compliant structure;

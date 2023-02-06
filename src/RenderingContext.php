@@ -40,6 +40,7 @@ class RenderingContext
         $fields = [
             ApplicationExceptionContext::FIELD_TITLE,
             ApplicationExceptionContext::FIELD_DETAIL,
+            ApplicationExceptionContext::FIELD_MESSAGE,
             ApplicationExceptionContext::FIELD_STATUS,
         ];
 
@@ -61,10 +62,11 @@ class RenderingContext
         /** @var ValidationException $exception */
         $exception = $this->exception;
 
-        $errors = collect($exception->validator->errors()->all())->map(static fn ($messages) => [
+        $errors = collect($exception->validator->errors()->all())->map(static fn ($message) => [
             'status' => $exception->status,
             'title' => 'Invalid Attribute',
-            'detail' => $messages,
+            'message' => $message,
+            'detail' => $message,
         ]);
 
         return [

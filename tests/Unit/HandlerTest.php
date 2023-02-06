@@ -158,6 +158,7 @@ class HandlerTest extends TestCase
                     'status' => $data['status'],
                     'title' => $data['title'],
                     'detail' => $data['detail'],
+                    'message' => $data['detail'],
                 ]
             ]
         ], $response->getData(true));
