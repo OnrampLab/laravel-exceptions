@@ -45,6 +45,7 @@ class RenderingContext
         ];
 
         return [
+            'message' => $e->getMessage(),
             'errors' => [
                 [
                     ...$context->getContext($fields, ! $debug),
@@ -70,6 +71,7 @@ class RenderingContext
         ]);
 
         return [
+            'message' => $exception->getMessage(),
             'errors' => $errors,
         ];
     }

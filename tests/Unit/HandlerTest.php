@@ -40,9 +40,12 @@ class HandlerTest extends TestCase
         Log::spy();
         Log::shouldReceive('error')
             ->times($shouldLog ? 1 : 0)
-            ->withArgs(function ($message, $context) use ($data) {
-                return $message === $data['message']
-                    && $context['detail'] === $data['detail']
+            ->withArgs(function ($logMessage, $context) use ($data) {
+                $logError = $data['error_log'];
+                $logErrorContext = $logError['context'];
+
+                return $logMessage === $logError['message']
+                    && $context['detail'] === $logErrorContext['detail']
                     && isset($context['adapter'])
                     && isset($context['errors']);
             });
@@ -143,6 +146,8 @@ class HandlerTest extends TestCase
      */
     public function render(Closure $getException, array $data): void
     {
+        $apiResponse = $data['api_error_response'];
+        $apiError = $apiResponse['errors'][0];
         $request = request();
         $request->headers->set('Content-Type', 'application/json');
         $request->headers->set('Accept', 'application/json');
@@ -153,16 +158,17 @@ class HandlerTest extends TestCase
         $this->assertInstanceOf(JsonResponse::class, $response);
 
         $this->assertEquals([
+            'message' => $apiResponse['message'],
             'errors' => [
                 [
-                    'status' => $data['status'],
-                    'title' => $data['title'],
-                    'detail' => $data['detail'],
-                    'message' => $data['detail'],
+                    'status' => $apiError['status'],
+                    'title' => $apiError['title'],
+                    'detail' => $apiError['detail'],
+                    'message' => $apiError['detail'],
                 ]
             ]
         ], $response->getData(true));
-        $this->assertEquals($data['status'], $response->getStatusCode());
+        $this->assertEquals($apiResponse['status'], $response->getStatusCode());
     }
 
     public function reportDataProvider()
@@ -174,37 +180,74 @@ class HandlerTest extends TestCase
             'authentication_exception_case' => [
                 fn() => new AuthenticationException('Authentication required'),
                 [
-                    'title' => 'Need Authentication',
-                    'detail' => 'Authentication required',
-                    'status' => 401,
+                    'api_error_response' => [
+                        'message' => 'Authentication required',
+                        'status' => 401,
+                        'errors' => [
+                            [
+                                'title' => 'Need Authentication',
+                                'detail' => 'Authentication required',
+                                'status' => 401,
+                            ]
+                        ]
+                    ],
                 ],
                 $shouldNotLog,
             ],
             'access_deny_http_exception_case' => [
                 fn() => new AccessDeniedHttpException('You have no access'),
                 [
-                    'title' => 'Forbidden',
-                    'detail' => 'You have no access',
-                    'status' => 403,
+                    'api_error_response' => [
+                        'message' => 'You have no access',
+                        'status' => 403,
+                        'errors' => [
+                            [
+                                'title' => 'Forbidden',
+                                'detail' => 'You have no access',
+                                'status' => 403,
+                            ]
+                        ]
+                    ],
                 ],
                 $shouldNotLog,
             ],
             'model_not_found_exception_case' => [
                 fn() => new ModelNotFoundException('Model not found'),
                 [
-                    'title' => 'Resource Not Found',
-                    'detail' => 'Model not found',
-                    'status' => 404,
+                    'api_error_response' => [
+                        'message' => 'Model not found',
+                        'status' => 404,
+                        'errors' => [
+                            [
+                                'title' => 'Resource Not Found',
+                                'detail' => 'Model not found',
+                                'status' => 404,
+                            ]
+                        ]
+                    ],
                 ],
                 $shouldNotLog,
             ],
             'application_exception_case' => [
                 fn() => new CustomApplicationException('Custom Title', 'Custom Error', [], Response::HTTP_CONFLICT),
                 [
-                    'title' => 'Custom Title',
-                    'detail' => 'Custom Error',
-                    'message' => 'Custom Title',
-                    'status' => 500,
+                    'api_error_response' => [
+                        'message' => 'Custom Error',
+                        'status' => 500,
+                        'errors' => [
+                            [
+                                'title' => 'Custom Title',
+                                'detail' => 'Custom Error',
+                                'status' => 500,
+                            ]
+                        ]
+                    ],
+                    'error_log' => [
+                        'message' => 'Custom Title',
+                        'context' => [
+                            'detail' => 'Custom Error',
+                        ],
+                    ],
                 ],
                 $shouldLog,
             ],
@@ -212,19 +255,40 @@ class HandlerTest extends TestCase
                 // NOTE: if not using closure, it will be failed due to facade is not ready
                 fn() => ValidationException::withMessages(['name' => 'name is required']),
                 [
-                    'title' => 'Invalid Attribute',
-                    'detail' => 'name is required',
-                    'status' => 422,
+                    'api_error_response' => [
+                        'message' => 'The given data was invalid.',
+                        'status' => 422,
+                        'errors' => [
+                            [
+                                'title' => 'Invalid Attribute',
+                                'detail' => 'name is required',
+                                'status' => 422,
+                            ]
+                        ]
+                    ],
                 ],
                 $shouldNotLog,
             ],
             'exception_case' => [
                 fn() => new Exception('Test'),
                 [
-                    'title' => 'Unknown Error',
-                    'detail' => 'Test',
-                    'message' => 'Unknown Error',
-                    'status' => 500,
+                    'api_error_response' => [
+                        'message' => 'Test',
+                        'status' => 500,
+                        'errors' => [
+                            [
+                                'title' => 'Unknown Error',
+                                'detail' => 'Test',
+                                'status' => 500,
+                            ]
+                        ]
+                    ],
+                    'error_log' => [
+                        'message' => 'Unknown Error',
+                        'context' => [
+                            'detail' => 'Test',
+                        ],
+                    ],
                 ],
                 $shouldLog,
             ],
