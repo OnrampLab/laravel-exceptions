@@ -84,8 +84,9 @@ class Handler extends ExceptionHandler
             return;
         }
 
+        $callable = Reflector::isCallable($reportCallable = [$e, 'report']);
         /** @phpstan-ignore-next-line  */
-        if (Reflector::isCallable($reportCallable = [$e, 'report']) && $this->container->call($reportCallable) !== false) {
+        if ($callable && $this->container->call($reportCallable) !== false) {
             return;
         }
 
