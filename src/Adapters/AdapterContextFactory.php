@@ -12,7 +12,7 @@ class AdapterContextFactory
     {
         if (is_null(Route::getCurrentRoute())) {
             /** @phpstan-ignore-next-line  */
-            $arg = Request::server('argv')[1];
+            $arg = data_get(Request::server('argv'), 1);
 
             // NOTE: this is not working for testing due to there is no efficient way to know if
             //       it's running in a job
