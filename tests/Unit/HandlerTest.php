@@ -146,6 +146,8 @@ class HandlerTest extends TestCase
      */
     public function render(Closure $getException, array $data): void
     {
+        $exception = $getException();
+        $context = method_exists($exception, 'context') ? $exception->context() : [];
         $apiResponse = $data['api_error_response'];
         $apiError = $apiResponse['errors'][0];
         $request = request();
@@ -153,7 +155,8 @@ class HandlerTest extends TestCase
         $request->headers->set('Accept', 'application/json');
 
         /** @var JsonResponse */
-        $response = $this->handler->render($request, $getException());
+        $response = $this->handler->render($request, $exception);
+
 
         $this->assertInstanceOf(JsonResponse::class, $response);
 
@@ -165,7 +168,8 @@ class HandlerTest extends TestCase
                     'title' => $apiError['title'],
                     'detail' => $apiError['detail'],
                     'message' => $apiError['detail'],
-                ]
+                    ...$context,
+                ],
             ]
         ], $response->getData(true));
         $this->assertEquals($apiResponse['status'], $response->getStatusCode());
@@ -229,7 +233,7 @@ class HandlerTest extends TestCase
                 $shouldNotLog,
             ],
             'application_exception_case' => [
-                fn() => new CustomApplicationException('Custom Title', 'Custom Error', [], Response::HTTP_CONFLICT),
+                fn() => new CustomApplicationException('Custom Title', 'Custom Error', ['name' => 'Test Name'], Response::HTTP_CONFLICT),
                 [
                     'api_error_response' => [
                         'message' => 'Custom Error',

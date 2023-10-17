@@ -103,6 +103,13 @@ class ApplicationExceptionContext
             $array = collect($array)->only($fields)->toArray();
         }
 
+        if (method_exists($e, 'context')) {
+            return [
+                ...$array,
+                ...$e->context(),
+            ];
+        }
+
         return $array;
     }
 
