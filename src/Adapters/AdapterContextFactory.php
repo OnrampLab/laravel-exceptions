@@ -11,7 +11,6 @@ class AdapterContextFactory
     public static function getAdapterContext(Throwable $exception): AdapterContext
     {
         if (is_null(Route::getCurrentRoute())) {
-            /** @phpstan-ignore-next-line  */
             $arg = data_get(Request::server('argv'), 1);
 
             // NOTE: this is not working for testing due to there is no efficient way to know if
