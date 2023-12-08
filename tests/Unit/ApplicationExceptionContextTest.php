@@ -4,6 +4,7 @@ namespace OnrampLab\LaravelExceptions\Tests\Unit;
 
 use Exception;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Queue\MaxAttemptsExceededException;
 use OnrampLab\LaravelExceptions\ApplicationExceptionContext;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -79,6 +80,19 @@ class ApplicationExceptionContextTest extends TestCase
 
         $this->assertEquals('Need Authentication', $array['title']);
         $this->assertEquals('You should login first', $array['detail']);
+        $this->assertStringStartsWith('##', $array['stacktrace'][0]);
+        $this->assertStringStartsWith('#0', $array['stacktrace'][1]);
+    }
+
+    /** @test */
+    public function getContext_should_work_for_general_MaxAttemptsExceededException(): void
+    {
+        $e = new MaxAttemptsExceededException('OnrampLab\Webhooks\CallWebhookJob has been attempted too many times or run too long. The job may have previously timed out.');
+        $context = new ApplicationExceptionContext($e);
+        $array = $context->getContext();
+
+        $this->assertEquals('Max Attempts Exceeded', $array['title']);
+        $this->assertEquals('OnrampLab\Webhooks\CallWebhookJob has been attempted too many times or run too long. The job may have previously timed out.', $array['detail']);
         $this->assertStringStartsWith('##', $array['stacktrace'][0]);
         $this->assertStringStartsWith('#0', $array['stacktrace'][1]);
     }
