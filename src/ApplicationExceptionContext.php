@@ -4,6 +4,7 @@ namespace OnrampLab\LaravelExceptions;
 
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Response;
+use Illuminate\Queue\MaxAttemptsExceededException;
 use OnrampLab\LaravelExceptions\Contracts\ApplicationException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
@@ -39,6 +40,8 @@ class ApplicationExceptionContext
             }
         } elseif ($e instanceof AuthenticationException) {
             $title = 'Need Authentication';
+        } elseif ($e instanceof MaxAttemptsExceededException) {
+            $title = 'Max Attempts Exceeded';
         }
 
         if ($e instanceof ApplicationException) {
